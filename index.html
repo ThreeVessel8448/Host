@@ -1,0 +1,1135 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Mystery Numbers</title>
+    <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Press+Start+2P&display=swap">
+    <link rel="stylesheet" href="styles.css">
+      <!-- Other head content -->
+      <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
+      <!-- Other head content -->
+  <link href="https://fonts.googleapis.com/icon?family=Material+Icons" rel="stylesheet">
+      <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
+      <link href="https://fonts.googleapis.com/css2?family=Sigmar+One&display=swap" rel="stylesheet">
+       <script src="https://www.gstatic.com/firebasejs/8.6.8/firebase-app.js"></script>
+  <script src="https://www.gstatic.com/firebasejs/8.6.8/firebase-auth.js"></script>
+  <script src="https://www.gstatic.com/firebasejs/8.6.8/firebase-firestore.js"></script>
+   
+    <style>
+
+@import url('https://fonts.googleapis.com/css2?family=Sigmar+One&display=swap');
+@import url('https://fonts.googleapis.com/css2?family=Roboto:wght@300;400;700&display=swap');
+
+::placeholder {
+  color: black;
+  opacity: 1; /* Firefox */
+}
+
+::-ms-input-placeholder { /* Edge 12 -18 */
+  color: red;
+}
+
+body {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    height: 100vh;
+    margin: 0;
+    font-family: 'Sigmar One', cursive;
+    background: linear-gradient(135deg, #0d47a1, #1976d2, #42a5f5);
+    background-size: 400% 400%;
+    animation: gradientBG 8s ease infinite;
+    color: #fff;
+}
+
+.container {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    background: rgba(0, 0, 0, 0.8);
+    padding: 20px;
+    border-radius: 15px;
+    box-shadow: 0 8px 16px rgba(0, 0, 0, 0.6);
+    text-align: center;
+}
+
+.mode-option {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    margin-bottom: 10px;
+}
+
+.mode-option button {
+    margin-right: 10px;
+}
+
+.info-icon {
+    cursor: pointer;
+    display: inline-block;
+    width: 16px;
+    height: 16px;
+    background-color: #000;
+    color: #fff;
+    text-align: center;
+    border-radius: 50%;
+    font-size: 12px;
+    line-height: 16px;
+    position: relative;
+    transition: background-color 0.3s ease;
+}
+
+.info-icon:hover {
+    background-color: #555;
+}
+
+.info-icon::after {
+    content: attr(data-info);
+    display: none;
+    position: absolute;
+    top: 100%;
+    left: 50%;
+    transform: translateX(-50%);
+    width: 200px;
+    background-color: #000;
+    color: #fff;
+    padding: 8px;
+    border-radius: 4px;
+    white-space: normal;
+    font-size: 12px;
+    line-height: 1.2;
+    z-index: 10;
+    transition: opacity 0.3s ease;
+}
+
+.info-icon:hover::after,
+.info-icon:focus::after {
+    display: block;
+    opacity: 1;
+}
+
+#settingsButton {
+    position: absolute;
+    top: 10px;
+    right: 10px;
+    background: rgba(0, 0, 0, 0.8);
+    padding: 10px 20px;
+    border: none;
+    cursor: pointer;
+    border-radius: 25px;
+    transition: transform 0.3s ease, box-shadow 0.3s ease;
+}
+
+#settingsButton i {
+    font-size: 24px;
+    color: #fff;
+    transition: transform 0.3s ease;
+}
+
+#settingsButton i:hover {
+    transform: rotate(90deg);
+}
+
+/* General button styling */
+button {
+    padding: 14px 28px;
+    margin: 10px;
+    cursor: pointer;
+    background-color: #0d47a1;
+    color: #fff;
+    color: white;
+    border: none;
+    border-radius: 25px;
+    transition: transform 0.3s ease, box-shadow 0.3s ease, background 0.3s ease;
+    font-family: 'Sigmar One', cursive;
+    font-size: 18px;
+    box-shadow: 0 6px 12px rgba(0, 0, 0, 0.2);
+}
+
+button:disabled {
+    cursor: not-allowed;
+    opacity: 0.5;
+}
+
+button:hover:enabled {
+    transform: translateY(-3px);
+    box-shadow: 0 8px 16px rgba(0, 0, 0, 0.3);
+    background: linear-gradient(135deg, #00cc66, #ff66cc, #0066ff);
+}
+
+button:active:enabled {
+    transform: translateY(1px);
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
+}
+
+@keyframes gradientBG {
+    0% { background-position: 0% 50%; }
+    50% { background-position: 100% 50%; }
+    100% { background-position: 0% 50%; }
+}
+
+
+
+/* Input styling */
+input[type="text"] {
+    width: 80%;
+    max-width: 300px;
+    padding: 10px;
+    margin: 10px 0;
+    border: 2px solid #42a5f5;
+    border-radius: 5px;
+    font-size: 16px;
+    outline: none;
+    transition: border-color 0.3s ease, box-shadow 0.3s ease;
+    font-family: 'Sigmar One', cursive;
+}
+
+input[type="text"]:focus {
+    border-color: #1e88e5;
+    box-shadow: 0 0 10px rgba(30, 136, 229, 0.5);
+}
+
+/* Modal styling */
+.modal {
+    display: none;
+    position: fixed;
+    z-index: 1;
+    left: 0;
+    top: 0;
+    width: 100%;
+    height: 100%;
+    overflow: auto;
+    background-color: rgba(0, 0, 0, 0.8);
+    padding-top: 60px;
+    transition: opacity 0.3s ease;
+}
+
+.modal-content {
+    background-color: #424242;
+    color: #fff;
+    margin: 5% auto;
+    padding: 20px;
+    border: 1px solid #888;
+    width: 80%;
+    max-width: 500px;
+    text-align: center;
+    border-radius: 15px;
+    box-shadow: 0 8px 16px rgba(0, 0, 0, 0.6);
+    font-family: 'Sigmar One', cursive;
+    transition: transform 0.3s ease;
+}
+
+.modal-content:hover {
+    transform: scale(1.05);
+}
+
+.close {
+    color: #bbb;
+    float: right;
+    font-size: 28px;
+    font-weight: bold;
+    cursor: pointer;
+}
+
+.close:hover,
+.close:focus {
+    color: #fff;
+    text-decoration: none;
+}
+
+/* Achievement and animation styles */
+.correct-animation {
+    animation: correctGuess 1s ease-in-out;
+}
+
+@keyframes correctGuess {
+    0% { background-color: white; }
+    50% { background-color: #28a745; }
+    100% { background-color: white; }
+}
+
+.timeout-animation {
+    animation: timeout 1s ease-in-out;
+}
+
+@keyframes timeout {
+    0% { background-color: white; }
+    50% { background-color: #dc3545; }
+    100% { background-color: white; }
+}
+
+.achievement {
+    display: none;
+    margin-top: 10px;
+    padding: 10px;
+    background-color: #ffdd57;
+    border-radius: 5px;
+    font-weight: bold;
+    font-size: 16px;
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
+    font-family: 'Sigmar One', cursive;
+}
+
+#shareButtonContainer {
+    position: absolute;
+    top: 10px;
+    left: 10px;
+    padding: 0px 0px;
+}
+
+#shareHighScoreButton {
+    background: rgba(0, 0, 0, 0.8);
+    border: none;
+    color: #fff;
+    font-size: 20px;
+    cursor: pointer;
+    outline: none;
+    padding: 10px 20px;
+    border-radius: 25px;
+    transition: transform 0.3s ease, box-shadow 0.3s ease, background-color 0.3s ease;
+}
+
+#shareHighScoreButton:hover {
+    color: #ffeb3b;
+    transform: translateY(-3px);
+    box-shadow: 0 8px 16px rgba(0, 0, 0, 0.3);
+    background-color: #444;
+}
+
+#shareHighScoreButton:active {
+    transform: translateY(1px);
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
+}
+
+
+    </style>
+</head>
+<body>
+  
+<div id="profile" class="container">
+    <h1>Create Your Profile</h1>
+    <hr>
+    <input type="text" id="playerName" placeholder="Enter your name">
+    <button id="startGame">Confirm Name</button>
+
+<audio id="backgroundMusic" loop autoplay>
+      <source src="/chiptune-grooving-142242.mp3" type="audio/mpeg">
+      Your browser does not support the audio element.
+    </audio>
+ </div>
+ 
+</body>
+   
+   
+   <script>
+document.querySelectorAll('.info-icon').forEach(icon => {
+    icon.addEventListener('click', () => {
+      const tooltip = icon.querySelector('::after');
+      if (tooltip.style.display === 'block') {
+        tooltip.style.display = 'none';
+      } else {
+        tooltip.style.display = 'block';
+      }
+    });
+  });
+
+   </script>
+   
+   <script>
+     document.addEventListener("DOMContentLoaded", () => {
+    let randomNumber = 0;
+    let guessCount = 0;
+    let maxGuesses = Infinity;
+    let timer = null;
+    let timeLeft = 0;
+    let isTimeChallenge = false;
+    let highScore = localStorage.getItem('highScore') || 0;
+
+    const profile = document.getElementById("profile");
+    const playerNameInput = document.getElementById("playerName");
+    const startGameButton = document.getElementById("startGame");
+    const menu = document.getElementById("menu");
+    const welcomeMessage = document.getElementById("welcomeMessage");
+    const singlePlayerButton = document.getElementById("singlePlayerButton");
+    const casualButton = document.getElementById("casualButton");
+    const hardcoreButton = document.getElementById("hardcoreButton");
+    const customRangeButton = document.getElementById("customRangeButton");
+    const timeChallengeButton = document.getElementById("timeChallengeButton");
+    const isTimeChallengeParam = document
+      .getElementById("isTimeChallengeParam");
+    const modeSelection = document.getElementById("modeSelection");
+    const game = document.getElementById("game");
+    const guessInput = document.getElementById("guessInput");
+    const guessButton = document.getElementById("guessButton");
+    const message = document.getElementById("message");
+    const score = document.getElementById("score");
+    const timerElement = document.getElementById("timer");
+    const restartButton = document.getElementById("restartButton");
+    const exitToMenuButton = document.getElementById("exitToMenuButton");
+    const customRange = document.getElementById("customRange");
+    const customMin = document.getElementById("customMin");
+    const customMax = document.getElementById("customMax");
+    const startCustomGameButton = document.getElementById("startCustomGame");
+    const correctSound = document.getElementById("correctSound");
+    const timeoutSound = document.getElementById("timeoutSound");
+    const highScoreSound = document.getElementById("highScoreSound");
+    const achievementMessage = document.getElementById("achievementMessage");
+    const settingsButton = document.getElementById("settingsButton");
+    const settingsModal = document.getElementById("settingsModal");
+    const closeModal = document.getElementsByClassName("close")[0];
+    var volumeControl = document.getElementById('musicVolume');
+    const shareHighScoreButton = document.getElementById("shareHighScoreButton");
+    const multiplayerButton = document.getElementById("multiPlayerButton");
+    const multiplayerOptions = document.getElementById("multiPlayer");
+    const hostGameButton = document.getElementById("hostGameButton");
+    const joinGameButton = document.getElementById("joinGameButton");
+    const joinButton = document.getElementById("joinButton");
+    const generateLinkButton = document.getElementById("generateLinkButton");
+    const invitationLink = document.getElementById("invitationLink");
+    const inviteURL = document.getElementById("inviteURL");
+    const inviteLink = document.getElementById("inviteLink");
+    const gameCodeInput = document.getElementById("gameCodeInput");
+    const hostGameDiv = document.getElementById("hostGame");
+    const joinGameDiv = document.getElementById("joinGame");
+    const loginButton = document.getElementById("loginButton");
+    const loginForm = document.getElementById("loginForm");
+    const emailInput = document.getElementById("email");
+    const passwordInput = document.getElementById("password");
+    const showSignupButton = document.getElementById("showSignup");
+    const signupForm = document.getElementById("signupForm");
+    const submitLoginButton = document.getElementById("submitLogin");
+    const submitSignupButton = document.getElementById("submitSignup");
+    const acceptInviteButton = document.getElementById("acceptInviteButton");
+    const refuseInviteButton = document.getElementById("refuseInviteButton");
+    const require = document
+      .getElementById("require")
+    const backgroundMusic = document.getElementById('backgroundMusic');
+
+  // Initialize Firebase
+    var firebaseConfig = {
+      apiKey: "AIzaSyC_LhMuetDxpmRq6_viDiBPnRIgaF7kvT4",
+      authDomain: "mystery-numbers-8e579.firebaseapp.com",
+      projectId: "mystery-numbers-8e579",
+      storageBucket: "mystery-numbers-8e579.appspot.com",
+      messagingSenderId: "421079441392",
+      appId: "1:421079441392:web:9e784ebdba207385510735",
+      measurementId: "G-6RF2J1GL3R"
+    };
+  
+    firebase.initializeApp(firebaseConfig);
+    var db = firebase.firestore();
+    var auth = firebase.auth();
+  
+// Sign in with Google
+    document.getElementById('loginButton').addEventListener('click', () => {
+      var provider = new firebase.auth.GoogleAuthProvider();
+      firebase.auth().signInWithRedirect(provider);
+    });
+    
+    // Handle authentication state changes
+    firebase.auth().onAuthStateChanged((user) => {
+      if (user) {
+        console.log('User signed in:', user);
+        document.getElementById('loginButton').style.display = 'none';
+      } else {
+        console.log('No user signed in.');
+        document.getElementById('loginButton').style.display = 'block';
+      }
+    });
+  
+    window.onload = function() {
+      console.log('Page loaded, checking redirect result...');
+      auth.getRedirectResult().then((result) => {
+        if (result.user) {
+          // User is signed in
+          var user = result.user;
+          console.log('Redirect result: User signed in:', user.email);
+          alert('Logged in successfully!');
+          document.getElementById('loginButton').style.display = 'none';
+        } else {
+          console.log('Redirect result: No user signed in.');
+        }
+      }).catch((error) => {
+        var errorCode = error.code;
+        var errorMessage = error.message;
+        console.error('Error signing in:', errorMessage);
+        alert(`Error signing in: ${errorMessage}`);
+      });
+    };
+
+
+    const savedName = localStorage.getItem("playerName");
+    let gameCode = ""; 
+    let invited = false; 
+    if (gameCode && invited) {
+      if (savedName) {
+        startGameFromMode(invited);
+      } else {
+        profile.style.display = "block";
+        menu.style.display = "none";
+      }
+    } else {
+      if (savedName) {
+        console.log(`Saved name found: ${savedName}`);
+        playerNameInput.value = savedName;
+        welcomeMessage.textContent = `Welcome back, ${savedName}!`;
+        profile.style.display = "none";
+        menu.style.display = "block";
+    
+        document.getElementById('startGame').addEventListener('click', () => {
+          var music = document.getElementById('backgroundMusic');
+          if (music) {
+            music.play().catch(error => {
+              console.error("Error playing background music:", error);
+            });
+          }
+        });
+      } else {
+        console.log("No saved name found.");
+        profile.style.display = "block";
+        menu.style.display = "none";
+      }
+    }
+    
+    startGameButton.addEventListener("click", () => {
+        const playerName = playerNameInput.value.trim();
+        if (playerName) {
+            console.log(`Player name entered: ${playerName}`);
+            localStorage.setItem("playerName", playerName); // Save the name to local storage
+            welcomeMessage.textContent = `Welcome, ${playerName}!`;
+            profile.style.display = "none";
+            menu.style.display = "block";
+
+            if (gameCode && invited) {
+                // Start the game with the invitation mode
+                startGameFromMode(invited);
+            }
+        } else {
+            console.log("No name entered.");
+            alert("Please enter your name.");
+        }
+    });
+        
+    
+    let achievements = JSON.parse(localStorage.getItem('achievements')) || [];
+let winStreak = 0;
+
+    settingsButton.addEventListener("click", () => {
+        settingsModal.style.display = "block";
+    });
+
+    closeModal.addEventListener("click", () => {
+        settingsModal.style.display = "none";
+    });
+
+    window.addEventListener("click", (event) => {
+        if (event.target === settingsModal) {
+            settingsModal.style.display = "none";
+        }
+    });
+
+    document.getElementById('startGame').addEventListener('click', () => {
+      var music = document.getElementById('backgroundMusic');
+      if (music) {
+        music.play().catch(error => {
+          console.error("Error playing background music:", error);
+        });
+      }
+    });
+    
+    const playButtonClickSound = () => {
+    const buttonClickSound = document.getElementById('buttonClickSound');
+    buttonClickSound.currentTime = 0; 
+    buttonClickSound.play();
+};
+
+    singlePlayerButton.addEventListener("click", () => {
+        menu.style.display = "none";
+        modeSelection.style.display = "block";
+    });
+    
+    multiplayerButton.addEventListener("click", () => {
+      menu.style.display = "none";
+      multiplayerOptions.style.display = "block";
+    });
+    
+    hostGameButton.addEventListener("click", () => {
+      multiplayerOptions.style.display = "none";
+      document.getElementById("hostGame").style.display = "block";
+    });
+    
+// Generate a unique game code
+function generateGameCode() {
+  return Math.random().toString(36).substr(2, 8).toUpperCase();
+}
+
+// Get game settings based on game mode
+function getGameSettings(gameMode) {
+  switch (gameMode) {
+    case "casual":
+      return { min: 1, max: 1000, maxGuesses: Infinity, isTimeChallenge: false };
+    case "hardcore":
+      return { min: 1, max: 10000, maxGuesses: 10, isTimeChallenge: false };
+    case "timeChallenge":
+      return { min: 1, max: 1000, maxGuesses: Infinity, isTimeChallenge: true };
+    case "customRange":
+      // Assuming customRange values come from user input
+      return { min: parseInt(customMin.value), max: parseInt(customMax.value), maxGuesses: Infinity, isTimeChallenge: false };
+    default:
+      return { min: 1, max: 1000, maxGuesses: Infinity, isTimeChallenge: false };
+  }
+}
+
+// Create a game
+function createGame(gameMode) {
+  const gameCode = generateGameCode(); // Generate a unique game code
+  const gameSettings = getGameSettings(gameMode);
+  const randomNumber = Math.floor(Math.random() * (gameSettings.max - gameSettings.min + 1)) + gameSettings.min;
+  const currentPlayer = Math.random() < 0.5 ? 'red' : 'blue'; // Randomly select starting player
+
+  const gameData = {
+    gameMode: gameMode, // Correct game mode (e.g., "casual", "hardcore", "timeChallenge", "customRange")
+    champ: "", // Optional field
+    min: gameSettings.min,
+    max: gameSettings.max,
+    maxGuesses: gameSettings.maxGuesses,
+    invited: true,
+    isTimeChallenge: gameSettings.isTimeChallenge,
+    randomNumber: randomNumber,
+    currentPlayer: currentPlayer
+  };
+
+  console.log("Creating game with data:", gameData);
+
+  db.collection("games").doc(gameCode).set(gameData)
+    .then(() => {
+      console.log(`Game created with code: ${gameCode}`);
+      alert(`Game created successfully! Share this game code: ${gameCode}`);
+    })
+    .catch(error => {
+      console.error('Error creating game:', error);
+    });
+}
+
+// Start the game using the invitation game code
+function startGameFromInvitation(gameCode) {
+  console.log(`Attempting to fetch game with code: ${gameCode}`);
+
+  db.collection("games").doc(gameCode).get()
+    .then((doc) => {
+      if (doc.exists) {
+        const data = doc.data();
+        console.log("Fetched game state data:", data);
+        if (data.invited) {
+          const gameMode = data.gameMode;
+          const playerName = localStorage.getItem("playerName");
+
+          if (playerName) {
+            startGame(gameMode, gameCode);
+          } else {
+            profile.style.display = "block";
+            menu.style.display = "none";
+          }
+        } else {
+          console.log("Invalid invitation.");
+        }
+      } else {
+        console.error("No such game found! Check if the game code is correct and exists in Firestore.");
+      }
+    })
+    .catch(error => {
+      console.error('Error fetching game state:', error);
+    });
+}
+
+// Start the game based on mode
+function startGame(gameMode, gameCode) {
+  const gameSettings = getGameSettings(gameMode);
+  startGameFromMode(gameSettings.min, gameSettings.max, gameSettings.maxGuesses, gameSettings.isTimeChallenge, gameCode);
+}
+
+// Start the game from mode settings
+function startGameFromMode(min, max, maxGuesses, isTimeChallenge, gameCode) {
+  modeSelection.style.display = "none";
+  customRange.style.display = "none";
+  game.style.display = "block";
+  initializeGame(min, max, maxGuesses, isTimeChallenge, gameCode);
+}
+
+// Initialize the game
+function initializeGame(min, max, maxGuesses, isTimeChallenge, gameCode) {
+  console.log(`Initializing game with code: ${gameCode}`);
+  db.collection("games").doc(gameCode).get()
+    .then((doc) => {
+      if (doc.exists) {
+        const data = doc.data();
+        const currentPlayer = data.currentPlayer;
+        console.log("Game data during initialization:", data);
+        updateUIForCurrentPlayer(currentPlayer);
+      } else {
+        console.error("No such game found during initialization!");
+      }
+    })
+    .catch(error => {
+      console.error('Error initializing game:', error);
+    });
+}
+
+// Update UI for the current player
+function updateUIForCurrentPlayer(player) {
+  if (player === 'red') {
+    message.textContent = "Red player's turn to guess!";
+  } else {
+    message.textContent = "Blue player's turn to guess!";
+  }
+}
+
+// Add event listener for page load to check invitation
+window.addEventListener('load', () => {
+  const urlParams = new URLSearchParams(window.location.search);
+  const gameCode = urlParams.get('gameCode');
+  const invited = urlParams.get('invited');
+
+  if (gameCode && invited) {
+    startGameFromInvitation(gameCode);
+  }
+});
+
+// Handle generating and sharing invitation links
+generateLinkButton.addEventListener("click", () => {
+  const gameModeSelect = document.getElementById("gameMode");
+  const gameMode = gameModeSelect.value;
+  const gameCode = generateGameCode();
+  const link = `${window.location.origin}?gameCode=${gameCode}&invited=${gameMode}`;
+  
+  // Optionally, copy the link to the clipboard
+  navigator.clipboard.writeText(link).then(() => {
+    console.log('Link copied to clipboard');
+    alert('The game link has been copied to your clipboard.');
+  }).catch(err => {
+    console.error('Failed to copy the link: ', err);
+  });
+
+  invitationLink.innerHTML = `Share this link: <a href="${link}" target="_blank">${link}</a>`;
+  invitationLink.style.display = "block";
+  shareButton.style.display = "block";
+
+  shareButton.addEventListener("click", () => {
+    if (navigator.share) {
+      navigator.share({
+        title: 'Game Invitation',
+        text: `Join the game: ${link}`,
+        url: link
+      }).then(() => {
+        console.log('Link shared successfully');
+      }).catch((error) => {
+        console.error('Error sharing link:', error);
+      });
+    } else {
+      alert('Web Share API is not supported in your browser.');
+    }
+  });
+});
+
+
+    exitToMenuButton.addEventListener("click", () => {
+        game.style.display = "none";
+        menu.style.display = "block";
+        resetGame();
+    });
+
+    function startGame(min, max, maxGuessesParam, isTimeChallengeParam) {
+      modeSelection.style.display = "none";
+      customRange.style.display = "none";
+      game.style.display = "block";
+      randomNumber = Math.floor(Math.random() * (max - min + 1)) + min;
+      guessCount = 0;
+      maxGuesses = maxGuessesParam;
+      isTimeChallenge = isTimeChallengeParam;
+      guessInput.min = min;
+      guessInput.max = max;
+      guessInput.placeholder = `Guess a number between ${min} and ${max}`;
+      score.textContent = `Guesses: ${guessCount}`;
+      message.textContent = "";
+      achievementMessage.style.display = "none";
+    
+      if (isTimeChallenge) {
+        timeLeft = 60;
+        timerElement.textContent = `Time left: ${timeLeft}s`;
+        timerElement.style.display = "block";
+        startTimer();
+      } else {
+        timerElement.style.display = "none";
+      }
+    }
+
+    casualButton.addEventListener("click", () => startGame(1, 1000, Infinity, false));
+    hardcoreButton.addEventListener("click", () => startGame(1, 10000, 10, false));
+    customRangeButton.addEventListener("click", () => {
+        modeSelection.style.display = "none";
+        customRange.style.display = "block";
+    });
+    timeChallengeButton.addEventListener("click", () => startGame(1, 1000, Infinity, true));
+
+    startCustomGameButton.addEventListener("click", () => {
+        const min = parseInt(customMin.value);
+        const max = parseInt(customMax.value);
+        if (min < max) {
+            startGame(min, max, Infinity, false);
+        } else {
+            alert("Invalid range. Make sure Min is less than Max.");
+        }
+    });
+
+    guessButton.addEventListener("click", () => {
+        const guess = parseInt(guessInput.value);
+        if (!isNaN(guess)) {
+            checkGuess(guess);
+        }
+        guessInput.value = "";
+    });
+
+    restartButton.addEventListener("click", restartGame);
+    
+    exitToMenuButton.addEventListener("click", () => {
+        game.style.display = "none";
+        menu.style.display = "block";
+        resetGame();
+    }); 
+
+    function startGame(min, max, maxGuessesParam, isTimeChallengeParam) {
+      modeSelection.style.display = "none";
+      customRange.style.display = "none";
+      game.style.display = "block";
+      randomNumber = Math.floor(Math.random() * (max - min + 1)) + min;
+      guessCount = 0;
+      maxGuesses = maxGuessesParam;
+      isTimeChallenge = isTimeChallengeParam;
+      guessInput.min = min;
+      guessInput.max = max;
+      guessInput.placeholder = `Guess a number between ${min} and ${max}`;
+      score.textContent = `Guesses: ${guessCount}`;
+      message.textContent = "";
+      achievementMessage.style.display = "none";
+    
+      if (isTimeChallenge) {
+        timeLeft = 60;
+        timerElement.textContent = `Time left: ${timeLeft}s`;
+        timerElement.style.display = "block";
+        startTimer();
+      } else {
+        timerElement.style.display = "none";
+      }
+    }
+    
+    function startTimer() {
+      clearInterval(timer); // Clear any existing timer
+      timer = setInterval(() => {
+        timeLeft--;
+        timerElement.textContent = `Time left: ${timeLeft}s`;
+        if (timeLeft <= 0) {
+          clearInterval(timer);
+          timeoutSound.play();
+          message.textContent = `Time's up! The number was ${randomNumber}.`;
+          guessButton.disabled = true;
+        }
+      }, 1000);
+    }
+    
+    function fallbackCopyTextToClipboard(text) {
+    const textArea = document.createElement("textarea");
+    textArea.value = text;
+    document.body.appendChild(textArea);
+    textArea.focus();
+    textArea.select();
+
+    try {
+        document.execCommand('copy');
+        alert('High score copied to clipboard! You can now paste it and share.');
+    } catch (err) {
+        console.error('Unable to copy text:', err);
+    }
+
+    document.body.removeChild(textArea);
+}
+
+shareHighScoreButton.addEventListener("click", () => {
+    const highScore = localStorage.getItem('highScore');
+    const playerName = playerNameInput.value.trim() || "A player";
+    const shareText = `${playerName} achieved a high score of ${highScore} in Mystery Numbers! Can you beat it?`;
+    const shareUrl = document.location.href; 
+
+    if (navigator.share) {
+        navigator.share({
+            title: 'Mystery Numbers High Score',
+            text: shareText,
+            url: shareUrl,
+        }).then(() => {
+            console.log('High score shared successfully');
+        }).catch((error) => {
+            console.error('Error sharing high score:', error);
+        });
+    } else {
+        fallbackCopyTextToClipboard(shareText + " " + shareUrl);
+    }
+});
+
+    function startTimer() {
+      clearInterval(timer); 
+      timer = setInterval(() => {
+        timeLeft--;
+        timerElement.textContent = `Time left: ${timeLeft}s`;
+        if (timeLeft <= 0) {
+          clearInterval(timer);
+          timeoutSound.play();
+          message.textContent = `Time's up! The number was ${randomNumber}.`;
+          game.classList.add("timeout-animation");
+          setTimeout(() => game.classList.remove("timeout-animation"), 1000);
+          guessButton.disabled = true;
+        }
+      }, 1000);
+    }
+
+    function checkGuess(guess) {
+      if (guess < parseInt(guessInput.min) || guess > parseInt(guessInput.max)) {
+        message.textContent = `Please enter a number between ${guessInput.min} and ${guessInput.max}.`;
+        return;
+      }
+    
+      guessCount++;
+      score.textContent = `Guesses: ${guessCount}`;
+    
+      if (guess === randomNumber) {
+        correctSound.play();
+        message.textContent = "Correct! You've guessed the number!";
+        game.classList.add("correct-animation");
+        setTimeout(() => game.classList.remove("correct-animation"), 500);
+    
+        if (!isTimeChallenge && (guessCount < highScore || highScore === 0)) {
+          highScore = guessCount;
+          localStorage.setItem('highScore', highScore);
+          highScoreSound.play();
+          achievementMessage.textContent = "New High Score!";
+          achievementMessage.style.display = "block";
+        }
+    
+        if (isTimeChallenge && timeLeft > 0) {
+          highScore = Math.max(highScore, timeLeft);
+          localStorage.setItem('highScore', highScore);
+          highScoreSound.play();
+          achievementMessage.textContent = "New High Score!";
+          achievementMessage.style.display = "block";
+        }
+    
+        guessButton.disabled = true;
+    
+        checkAchievements();
+      } else if (guess < randomNumber) {
+        message.textContent = "Too low! Try again.";
+      } else {
+        message.textContent = "Too high! Try again.";
+      }
+    
+      if (guessCount >= maxGuesses) {
+        timeoutSound.play();
+        message.textContent = `Game over! The number was ${randomNumber}.`;
+        game.classList.add("timeout-animation");
+        setTimeout(() => game.classList.remove("timeout-animation"), 1000);
+        guessButton.disabled = true;
+    
+
+        checkAchievements();
+      }
+    }
+    
+    function checkAchievements() {
+    if (guessCount === 1 && !achievements.includes("Bullseye!")) {
+        achievements.push("Bullseye!");
+        alert("Achievement Unlocked: Bullseye! (Guess the correct number on the first attempt)");
+    }
+    
+    if (isTimeChallenge && timeLeft >= 50 && !achievements.includes("Speedster")) {
+        achievements.push("Speedster");
+        alert("Achievement Unlocked: Speedster (Guess the number within 10 seconds in the time challenge)");
+    }
+
+    if (guessCount === 5 && !achievements.includes("One Of A Kind")) {
+        achievements.push("One Of A Kind");
+        alert("Achievement Unlocked: One Of A Kind (Guess the number after 5 attempts in hardcore)");
+    }
+
+    if (winStreak === 10 && !achievements.includes("Streak Master")) {
+        achievements.push("Streak Master");
+        alert("Achievement Unlocked: Streak Master (Achieve a winning streak of 10 correct guesses)");
+    }
+
+    localStorage.setItem('achievements', JSON.stringify(achievements));
+    document.getElementById("achievementsCount").textContent = `You have earned ${achievements.length} achievements.`;
+}
+    function restartGame() {
+        game.style.display = "none";
+        modeSelection.style.display = "block";
+        resetGame();
+    }
+    
+    function adjustVolume() {
+    var volumeValue = parseFloat(volumeControl.value);
+    console.log('Volume changed to:', volumeValue);
+    
+    backgroundMusic.volume = volumeValue;
+}
+document.querySelectorAll('button').forEach(button => {
+    button.addEventListener('click', playButtonClickSound);
+});
+volumeControl.addEventListener('input', adjustVolume);
+
+    function resetGame() {
+        clearInterval(timer);
+        guessButton.disabled = false;
+        guessCount = 0;
+        message.textContent = "";
+        score.textContent = "";
+        timerElement.textContent = "";
+        guessInput.value = "";
+    }
+});
+   </script>
+   
+   
+    <div id="menu" class="container" style="display:none;">
+      
+        <h1>Mystery Numbers</h1>
+        <hr>
+        <h2>Main Menu</h2>
+        <p id="welcomeMessage"></p>
+        <button id="singlePlayerButton">Single Player</button>
+        <button id="multiPlayerButton">Multi Player</button>
+        
+    </div>
+
+ <div id="multiPlayer" class="container" style="display: none;">
+    <h1>Bored? Play With Friends</h1>
+    <hr>
+    <button id="hostGameButton">Host Game</button>
+    <span class="info-icon" data-info="Choose a gamemode, invite your friend, 1v1 with them.">i</span>
+</div>
+
+<div id="hostGame" class="container" style="display: none;">
+    <h2>Host Game</h2>
+    <label for="gameMode">Choose Game Mode:</label>
+    <select id="gameMode">
+        <option value="casual">Casual</option>
+        <option value="hardcore">Hardcore</option>
+        <option value="timeChallenge">Time Challenge</option>
+
+        <option value="customRange">Custom Range</option>
+    </select>
+    </select>
+    <button id="generateLinkButton">Start Game</button>
+    <div id="invitationLink" style="display: none;"></div>
+    <p>Share this link to start the game:</p>
+    <button id="shareButton" style="display: none;">Share Link</button>
+</div>
+
+<div id="modeSelection" class="container" style="display:none;">
+  <h1>Select Game Mode</h1>
+    <div class="mode-option">
+      <button id="storymodeButton">Story Mode(coming soon)</button>
+      <span class="info-icon" data-info="Wait it's coming soon">i</span>
+    </div>
+  <div class="mode-option">
+    <button id="casualButton">Casual</button>
+    <span class="info-icon" data-info="Guess a number between 1 and 1000. You have unlimited guesses!">i</span>
+  </div>
+  <div class="mode-option">
+    <button id="hardcoreButton">Hardcore</button>
+    <span class="info-icon" data-info="Guess a number between 1 and 10,000. You have only 10 guesses!">i</span>
+  </div>
+  <div class="mode-option">
+    <button id="customRangeButton">Customizable Range</button>
+    <span class="info-icon" data-info="Set your own range of numbers to guess from. Tailor the difficulty to your preference!">i</span>
+  </div>
+  <div class="mode-option">
+    <button id="timeChallengeButton">Time Challenge</button>
+    <span class="info-icon" data-info="Guess a number between 1 and 1000. You have 60 seconds. Race against the clock!">i</span>
+  </div>
+</div>
+
+<div id="customRange" class="container" style="display:none;">
+    <h1>Set Your Range</h1>
+    <p>Choose the range of possible numbers:</p>
+    <input type="number" id="customMin" placeholder="Min">
+    <input type="number" id="customMax" placeholder="Max">
+    <button id="startCustomGame">Start Game</button>
+</div>
+
+<div id="game" class="container" style="display:none;">
+ 
+    <h1>Guess the Number!</h1>
+    <p id="gameInstructions"></p>
+    <input type="number" id="guessInput" min="1">
+    <button id="guessButton">Guess</button>
+    <p id="message"></p>
+    <p id="score"></p>
+    <p id="timer"></p>
+    <p class="achievement" id="achievementMessage"></p>
+    <button id="restartButton">Restart</button>
+   <button id="exitToMenuButton"><i class="fas fa-home"></i></button>
+</div>
+
+<div id="settingsModal" class="modal" style="display:none;">
+  <div class="modal-content">
+    <span class="close">&times;</span>
+    <h2>Settings </h2>      <p>V1.0.1</p>
+    <hr>
+    <div>
+      <h3>Achievements</h3>
+      <p id="achievementsCount">You have earned 0 achievements.</p>
+    </div>
+    <div>
+      <h3>Music Volume</h3>
+         <button onclick="document.getElementById('backgroundMusic').play()">Play Music</button>          <button onclick="document.getElementById('backgroundMusic').pause()">Stop Music</button>
+
+      <input type="range" id="musicVolume" min="0" max="1" step="0.01" value="0.5">
+    </div>
+    <h3>Don't have an account! Try logging in⬇️⬇️</h3>
+     <button class="google-button" id="loginButton">
+    <span>Login with Google</span>
+    <span class="google-icon material-icons">login</span>
+</button>
+    <div>
+      <h3>Follow Us</h3>
+      <p>
+        <a href="https://instagram.com/theprogramminghub3" target="_blank">
+          <i class="fab fa-instagram fa-2x"></i>
+        </a>
+        <a href="https://github.com/ThreeVessel8448" target="_blank">
+          <i class="fab fa-github fa-2x"></i>
+        </a>
+      </p>
+    </div>
+  </div>
+</div>
+
+
+     <audio id="buttonClickSound" src="/click-button-140881.mp3" preload="auto"></audio>
+    <audio id="correctSound" src="/glock-new-idea-twinkle-om-fx-1-00-04.mp3" preload="auto"></audio>
+    <audio id="timeoutSound" src="/wrong-buzzer-6268.mp3" preload="auto"></audio>
+    <audio id="highScoreSound" src="/success-fanfare-trumpets-6185.mp3" preload="auto"></audio>
+    
+    <button id="settingsButton"><i class="fas fa-cog"></i></button>
+    
+   
+     <div id="shareButtonContainer">
+    <button id="shareHighScoreButton">
+      <i class="fas fa-share-alt"></i>
+    </button>
+  </div>
+ 
+      </div>
+    </div>
+    </div>
+</body>
+</html>
+      
